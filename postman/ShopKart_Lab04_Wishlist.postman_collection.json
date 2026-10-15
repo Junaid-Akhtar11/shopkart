@@ -1,0 +1,293 @@
+{
+  "info": {
+    "_postman_id": "lab04-shopkart-wishlist-collection",
+    "name": "ShopKart - Wishlist Service (Lab 04)",
+    "description": "Comprehensive Postman test collection for ShopKart Lab 04 covering Tasks 1 to 4, Edge Cases, and Bonus Challenges.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Setup - Login Customer (Get Token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login Successful', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.token) {",
+              "        pm.collectionVariables.set('token', jsonData.token);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        }
+      }
+    },
+    {
+      "name": "1. Task 2 - Add Product to Wishlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 or 201 Success', function () {",
+              "    pm.expect([200, 201]).to.include(pm.response.code);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.message).to.eql('Product added to wishlist');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        }
+      }
+    },
+    {
+      "name": "2. Task 2 - Duplicate Wishlist Entry (409 Conflict)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function () {",
+              "    pm.response.to.have.status(409);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.message).to.include('already');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        }
+      }
+    },
+    {
+      "name": "3. Task 3 - Get Current User's Wishlist (Populated)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.wishlist).to.be.an('array');",
+              "    pm.expect(jsonData.count).to.be.a('number');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist"]
+        }
+      }
+    },
+    {
+      "name": "4. Task 4 - Remove Product from Wishlist",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 Success', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.message).to.eql('Product removed from wishlist');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        }
+      }
+    },
+    {
+      "name": "5. Task 4 - Remove Non-existent Product from Wishlist (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404 Not Found', function () {",
+              "    pm.response.to.have.status(404);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}"]
+        }
+      }
+    },
+    {
+      "name": "6. Test 5 - Unauthenticated Access (401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/wishlist",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist"]
+        }
+      }
+    },
+    {
+      "name": "7. Bonus Task 23 - Toggle Wishlist Item",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 with saved boolean', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData).to.have.property('saved');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/{{productId}}/toggle",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "{{productId}}", "toggle"]
+        }
+      }
+    },
+    {
+      "name": "8. Bonus Task 24 - Wishlist Count",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200 with count number', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.count).to.be.a('number');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/wishlist/count",
+          "host": ["{{baseUrl}}"],
+          "path": ["wishlist", "count"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "productId",
+      "value": "6ac632a46578d364490d4430"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

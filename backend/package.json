@@ -1,0 +1,42 @@
+{
+  "name": "shopkart-backend",
+  "version": "1.0.0",
+  "description": "ShopKart - Customer Authentication Service (Lab 01)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "seed": "node seeds/seedProducts.js",
+    "test": "node test.js",
+    "test:auth": "node test.js",
+    "test:products": "node test-product-apis.js",
+    "test:wishlist": "node test-wishlist-apis.js",
+    "test:cart": "node test-cart-apis.js",
+    "test:orders": "node test-order-apis.js",
+    "test:all": "node test.js && node test-product-apis.js && node test-wishlist-apis.js && node test-cart-apis.js && node test-order-apis.js"
+  },
+  "keywords": [
+    "shopkart",
+    "mern",
+    "express",
+    "jwt",
+    "authentication",
+    "cookies",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.3",
+    "razorpay": "^2.9.8"
+  },
+  "allowScripts": {
+    "bcrypt@5.1.1": true
+  }
+}

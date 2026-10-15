@@ -1,0 +1,270 @@
+{
+  "info": {
+    "_postman_id": "7304b1e7-f6b4-44e7-b67e-55e0f2444d3d",
+    "name": "ShopKart - Customer Authentication Service (Lab 01)",
+    "description": "Comprehensive Postman Collection for ShopKart Customer Authentication Service covering Tasks 1 to 4 and the Bonus Challenge.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Task 1 - Register Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Customer created without returning password', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.customer).to.have.property('_id');",
+              "    pm.expect(jsonData.customer.email).to.eql('john@gmail.com');",
+              "    pm.expect(jsonData.customer.password).to.be.undefined;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\",\n  \"phone\": \"9876543210\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "register"]
+        }
+      }
+    },
+    {
+      "name": "2. Task 1 - Duplicate Email Rejection",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "pm.test('Rejection message is Email already exists', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.false;",
+              "    pm.expect(jsonData.message).to.eql('Email already exists');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"John Doe Duplicate\",\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\",\n  \"phone\": \"9876543210\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/register",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "register"]
+        }
+      }
+    },
+    {
+      "name": "3. Task 2 - Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('HttpOnly token cookie is received', function () {",
+              "    var cookie = pm.cookies.get('token');",
+              "    pm.expect(cookie).to.not.be.undefined;",
+              "});",
+              "pm.test('Response does not leak password', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.message).to.eql('Login successful');",
+              "    if (jsonData.customer) {",
+              "        pm.expect(jsonData.customer.password).to.be.undefined;",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"john@gmail.com\",\n  \"password\": \"john123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "login"]
+        }
+      }
+    },
+    {
+      "name": "4. Task 3 - Get Profile (Authenticated)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns customer profile without password', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('_id');",
+              "    pm.expect(jsonData).to.have.property('fullName');",
+              "    pm.expect(jsonData).to.have.property('email');",
+              "    pm.expect(jsonData).to.have.property('phone');",
+              "    pm.expect(jsonData.password).to.be.undefined;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "me"]
+        }
+      }
+    },
+    {
+      "name": "5. Bonus Challenge - Change Password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Password changed successfully', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.message).to.eql('Password changed successfully');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"oldPassword\": \"john123\",\n  \"newPassword\": \"newjohn456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/customers/change-password",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "change-password"]
+        }
+      }
+    },
+    {
+      "name": "6. Task 4 - Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Logged out successfully', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.be.true;",
+              "    pm.expect(jsonData.message).to.eql('Logged out successfully');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "logout"]
+        }
+      }
+    },
+    {
+      "name": "7. Task 3 - Get Profile (After Logout -> 401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 401 Unauthorized', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/customers/me",
+          "host": ["{{baseUrl}}"],
+          "path": ["customers", "me"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
